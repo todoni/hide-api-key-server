@@ -3,6 +3,9 @@ const bodyParser = require("body-parser");
 const axios = require("axios");
 const cors = require("cors");
 const dotenv = require("dotenv");
+const recorder = require("node-record-lpcm16");
+const speech = require("@google-cloud/speech");
+const client = new speech.SpeechClient();
 
 const corsConfig = {
   origin: "http://localhost:5173",
@@ -10,7 +13,7 @@ const corsConfig = {
 };
 
 const app = express();
-const PORT = 3000;
+const PORT = 3002;
 
 dotenv.config();
 
@@ -44,16 +47,28 @@ app.post("/google-tts", async (req, res) => {
 });
 
 app.post("/google-stt", async (req, res) => {
+	/**
+ * TODO(developer): Uncomment the following lines before running the sample.
+ */
+
   const audioContent = req.body;
 
   try {
-    const otherApiKey = "YOUR_OTHER_API_KEY";
-    const OTHER_BASE_URL = "https://api.example.com"; // Replace with the base URL of the other API
+    
+	  recorder
+  .record({
+    sampleRateHertz: sampleRateHertz,
+    threshold: 0,
+    // Other options, see https://www.npmjs.com/package/node-record-lpcm16#options
+    verbose: false,
+    recordProgram: 'rec', // Try also "arecord" or "sox"
+    silence: '10.0',
+  })
+  .stream()
+  .on('error', console.error)
+  .pipe(recognizeStream);
 
-    const headers = {
-      "Content-Type": "application/json",
-      Authorization: `Bearer ${otherApiKey}`,
-    };
+console.log('Listening, press Ctrl+C to stop.');
 
     const response = await axios.post(
       `${OTHER_BASE_URL}/endpoint`,
