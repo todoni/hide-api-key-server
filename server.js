@@ -3,9 +3,6 @@ const bodyParser = require("body-parser");
 const axios = require("axios");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const recorder = require("node-record-lpcm16");
-const speech = require("@google-cloud/speech");
-const client = new speech.SpeechClient();
 
 const corsConfig = {
   origin: "http://localhost:5173",
@@ -13,7 +10,7 @@ const corsConfig = {
 };
 
 const app = express();
-const PORT = 3002;
+const PORT = 3000;
 
 dotenv.config();
 
@@ -41,63 +38,13 @@ app.post("/google-tts", async (req, res) => {
 
     res.status(response.status).json(response.data);
   } catch (error) {
+    const { status, data } = error.response;
     console.error("Error occurred:", error);
-    res.status(500).json({ error: "Error occurred during API call." });
+    res.status(status).json({ error: "Error occurred during API call." });
   }
 });
 
-app.post("/google-stt", async (req, res) => {
-  const audioContent = req.body;
-
-  try {
-    const request = {
-      config: {
-        encoding: encoding,
-        sampleRateHertz: sampleRateHertz,
-        languageCode: languageCode,
-      },
-      interimResults: false, // If you want interim results, set this to true
-    };
-
-    // Create a recognize stream
-    const recognizeStream = client
-      .streamingRecognize(request)
-      .on("error", console.error)
-      .on("data", (data) =>
-        process.stdout.write(
-          data.results[0] && data.results[0].alternatives[0]
-            ? `Transcription: ${data.results[0].alternatives[0].transcript}\n`
-            : "\n\nReached transcription time limit, press Ctrl+C\n"
-        )
-      );
-
-    recorder
-      .record({
-        sampleRateHertz: sampleRateHertz,
-        threshold: 0,
-        // Other options, see https://www.npmjs.com/package/node-record-lpcm16#options
-        verbose: false,
-        recordProgram: "rec", // Try also "arecord" or "sox"
-        silence: "10.0",
-      })
-      .stream()
-      .on("error", console.error)
-      .pipe(recognizeStream);
-
-    console.log("Listening, press Ctrl+C to stop.");
-
-    const response = await axios.post(
-      `${OTHER_BASE_URL}/endpoint`,
-      audioContent,
-      { headers }
-    );
-
-    res.status(response.status).json(response.data);
-  } catch (error) {
-    console.error("Error occurred:", error);
-    res.status(500).json({ error: "Error occurred during API call." });
-  }
-});
+app.post("/google-stt", async (req, res) => {});
 
 app.post("/openai-chat", async (req, res) => {
   const audioContent = req.body.content;
@@ -119,7 +66,8 @@ app.post("/openai-chat", async (req, res) => {
     res.status(response.status).json(response.data);
   } catch (error) {
     console.error("Error occurred:", error);
-    res.status(500).json({ error: "Error occurred during API call." });
+    const { status, data } = error.response;
+    res.status(status).json({ error: "Error occurred during API call." });
   }
 });
 
