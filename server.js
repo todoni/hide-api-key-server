@@ -5,14 +5,16 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 
 const corsConfig = {
-  origin: "http://localhost:5173",
+  origin: ["http://15.164.163.59:5173", "http://s3-sohan-bucket.s3-website.ap-northeast-2.amazonaws.com", "https://goodganglabs-quest-frontend.vercel.app/"],
   credentials: true,
 };
 
 const app = express();
 const PORT = 3000;
 
-dotenv.config();
+dotenv.config({
+  path:"/home/ubuntu/hide-api-key-server/.env"
+});
 
 app.use(bodyParser.json());
 app.use(cors(corsConfig));
@@ -59,13 +61,15 @@ app.post("/openai-chat", async (req, res) => {
       Authorization: `Bearer ${API_KEY}`,
     };
 
+    console.log("hey??");
+    console.log(BASE_URL);
     const response = await axios.post(`${BASE_URL}/${endpoint}`, audioContent, {
       headers,
     });
 
     res.status(response.status).json(response.data);
   } catch (error) {
-    console.error("Error occurred:", error);
+    //console.error("Error occurred:", error);
     const { status, data } = error.response;
     res.status(status).json({ error: "Error occurred during API call." });
   }
