@@ -5,21 +5,22 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 
 const corsConfig = {
-  origin: ["http://15.164.163.59:5173", "http://s3-sohan-bucket.s3-website.ap-northeast-2.amazonaws.com", "https://goodganglabs-quest-frontend.vercel.app/"],
+  origin: ["http://15.164.163.59", "http://s3-sohan-bucket.s3-website.ap-northeast-2.amazonaws.com", "https://goodganglabs-quest-frontend.vercel.app/"],
   credentials: true,
 };
 
 const app = express();
-const PORT = 3000;
+const PORT = 8080;
 
 dotenv.config({
-  path:"/home/ubuntu/hide-api-key-server/.env"
+  path:"./.env"
 });
 
 app.use(bodyParser.json());
 app.use(cors(corsConfig));
 
-app.post("/google-tts", async (req, res) => {
+app.get("/", (req, res) => {res.send("hello");});
+app.post("/api/google-tts/", async (req, res) => {
   const audioContent = req.body.audioContent;
   const endpoint = req.body.endpoint;
   console.log("req body:", req.body);
@@ -48,7 +49,7 @@ app.post("/google-tts", async (req, res) => {
 
 app.post("/google-stt", async (req, res) => {});
 
-app.post("/openai-chat", async (req, res) => {
+app.post("/api/openai-chat/", async (req, res) => {
   const audioContent = req.body.content;
   const endpoint = req.body.endpoint;
 
