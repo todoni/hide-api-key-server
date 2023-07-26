@@ -5,7 +5,11 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 
 const corsConfig = {
-  origin: ["http://15.164.163.59", "http://s3-sohan-bucket.s3-website.ap-northeast-2.amazonaws.com", "https://goodganglabs-quest-frontend.vercel.app/"],
+  origin: [
+    "http://localhost:5173",
+    "http://s3-sohan-bucket.s3-website.ap-northeast-2.amazonaws.com",
+    "https://goodganglabs-quest-frontend.vercel.app/",
+  ],
   credentials: true,
 };
 
@@ -13,13 +17,15 @@ const app = express();
 const PORT = 8080;
 
 dotenv.config({
-  path:"./.env"
+  path: "./.env",
 });
 
 app.use(bodyParser.json());
 app.use(cors(corsConfig));
 
-app.get("/", (req, res) => {res.send("hello");});
+app.get("/", (req, res) => {
+  res.send("hello");
+});
 app.post("/api/google-tts/", async (req, res) => {
   const audioContent = req.body.audioContent;
   const endpoint = req.body.endpoint;
