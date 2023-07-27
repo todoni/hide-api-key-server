@@ -4,18 +4,18 @@ const axios = require("axios");
 const cors = require("cors");
 const dotenv = require("dotenv");
 
+dotenv.config({
+  path: "../.env",
+});
+
 const corsConfig = {
   origin: [
-    "http://localhost:5173",
+    `http://localhost:${process.env.CLIENT_PORT}`,
     "http://s3-sohan-bucket.s3-website.ap-northeast-2.amazonaws.com",
     "https://goodganglabs-quest-frontend.vercel.app/",
   ],
   credentials: true,
 };
-
-dotenv.config({
-  path: "../.env",
-});
 
 const app = express();
 
