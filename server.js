@@ -13,12 +13,13 @@ const corsConfig = {
   credentials: true,
 };
 
-const app = express();
-const PORT = 8080;
-
 dotenv.config({
-  path: "./.env",
+  path: "../.env",
 });
+
+const app = express();
+
+const PORT = process.env.SERVER_PORT;
 
 app.use(bodyParser.json());
 app.use(cors(corsConfig));
@@ -58,7 +59,6 @@ app.post("/google-stt", async (req, res) => {});
 app.post("/api/openai-chat/", async (req, res) => {
   const audioContent = req.body.content;
   const endpoint = req.body.endpoint;
-
   try {
     const API_KEY = process.env.OPENAI_API_KEY;
     const BASE_URL = process.env.OPENAI_BASE_URL;
@@ -68,15 +68,12 @@ app.post("/api/openai-chat/", async (req, res) => {
       Authorization: `Bearer ${API_KEY}`,
     };
 
-    console.log("hey??");
-    console.log(BASE_URL);
     const response = await axios.post(`${BASE_URL}/${endpoint}`, audioContent, {
       headers,
     });
 
     res.status(response.status).json(response.data);
   } catch (error) {
-    //console.error("Error occurred:", error);
     const { status, data } = error.response;
     res.status(status).json({ error: "Error occurred during API call." });
   }
